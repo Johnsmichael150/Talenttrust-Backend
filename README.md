@@ -6,6 +6,15 @@ Express API for the TalentTrust decentralized freelancer escrow protocol. Handle
 
 - Node.js 18+
 - npm or yarn
+- Access to a Soroban RPC node (e.g., Futurenet)
+
+## Environment Variables
+
+Create a `.env` file or export the following variables:
+```bash
+SOROBAN_RPC_URL="https://rpc-futurenet.stellar.org:443"
+SOROBAN_NETWORK_PASSPHRASE="Test SDF Future Network ; October 2022"
+```
 
 ## Setup
 
