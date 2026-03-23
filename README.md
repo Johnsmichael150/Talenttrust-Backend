@@ -23,6 +23,9 @@ npm run build
 # Run tests
 npm test
 
+# Run tests with coverage
+npm test -- --coverage
+
 # Start dev server (with hot reload)
 npm run dev
 
@@ -39,6 +42,28 @@ npm start
 | `npm run dev`   | Run with ts-node-dev           |
 | `npm test`      | Run Jest tests                 |
 | `npm run lint`  | Run ESLint                     |
+
+## Features
+
+### Audit Log
+
+Immutable, tamper-evident audit logging for all sensitive state changes (contracts, payments, users, auth events).
+
+- Every entry is frozen and hash-chained (SHA-256) — any tampering is detectable
+- REST API for querying and integrity verification at `/api/v1/audit`
+- Per-request logging helper via `res.locals.audit`
+
+See [docs/backend/audit-log.md](docs/backend/audit-log.md) for full documentation.
+
+## API Endpoints
+
+| Method | Path                      | Description                        |
+|--------|---------------------------|------------------------------------|
+| GET    | `/health`                 | Health check                       |
+| GET    | `/api/v1/contracts`       | List contracts                     |
+| GET    | `/api/v1/audit`           | Query audit log entries            |
+| GET    | `/api/v1/audit/integrity` | Verify hash chain integrity        |
+| GET    | `/api/v1/audit/:id`       | Get single audit entry by ID       |
 
 ## Contributing
 
