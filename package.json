@@ -7,23 +7,38 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "dev": "ts-node-dev --respawn src/index.ts",
+    "blue": "cross-env APP_COLOR=blue PORT=3001 ts-node-dev --respawn src/index.ts",
+    "green": "cross-env APP_COLOR=green PORT=3002 ts-node-dev --respawn src/index.ts",
+    "router": "cross-env MODE=router PORT=3000 ts-node-dev --respawn src/index.ts",
+    "deploy:switch-green": "cross-env MODE=deploy ts-node src/deploy.ts switch-green",
+    "deploy:rollback": "cross-env MODE=deploy ts-node src/deploy.ts rollback",
+    "deploy:status": "cross-env MODE=deploy ts-node src/deploy.ts status",
     "test": "jest",
-    "lint": "eslint src --ext .ts"
+    "test:watch": "jest --watch",
+    "test:cov": "jest --coverage",
+    "lint": "eslint src/**/*.ts --fix",
+    "postinstall": "npm run build"
   },
   "engines": {
     "node": ">=18"
   },
   "license": "MIT",
   "dependencies": {
-    "express": "^4.21.0"
+    "express": "^4.21.0",
+    "cross-env": "^7.0.3"
   },
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/jest": "^29.5.12",
     "@types/node": "^22.9.0",
+    "@types/supertest": "^6.0.2",
+    "eslint": "^8.57.0",
     "jest": "^29.7.0",
+    "supertest": "^7.1.0",
     "ts-jest": "^29.2.5",
     "ts-node-dev": "^2.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.8.1",
+    "@typescript-eslint/parser": "^8.8.1",
     "typescript": "^5.6.3"
   }
 }
