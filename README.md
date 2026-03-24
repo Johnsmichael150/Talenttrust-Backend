@@ -32,13 +32,46 @@ npm start
 
 ## Scripts
 
-| Script   | Description                    |
-|----------|--------------------------------|
-| `npm run build` | Compile TypeScript to `dist/`  |
-| `npm run start` | Run production server          |
-| `npm run dev`   | Run with ts-node-dev           |
-| `npm test`      | Run Jest tests                 |
-| `npm run lint`  | Run ESLint                     |
+| Script          | Description                   |
+| --------------- | ----------------------------- |
+| `npm run build` | Compile TypeScript to `dist/` |
+| `npm run start` | Run production server         |
+| `npm run dev`   | Run with ts-node-dev          |
+| `npm test`      | Run Jest tests                |
+| `npm run lint`  | Run ESLint                    |
+
+## Health Endpoint
+
+`GET /health` returns structured diagnostics for the service and its dependencies.
+
+| Field           | Description                                  |
+| --------------- | -------------------------------------------- |
+| `status`        | `"ok"` (HTTP 200) or `"degraded"` (HTTP 503) |
+| `service`       | Always `"talenttrust-backend"`               |
+| `timestamp`     | ISO-8601 time of the check                   |
+| `uptimeSeconds` | Process uptime in seconds                    |
+| `probes`        | Array of dependency probe results            |
+
+See [docs/backend/health.md](docs/backend/health.md) for full documentation.
+
+### Environment Variables
+
+| Variable            | Description                                           |
+| ------------------- | ----------------------------------------------------- |
+| `STELLAR_RPC_URL`   | Soroban/Horizon RPC base URL to probe                 |
+| `REQUIRED_ENV_VARS` | Comma-separated list of env var names to assert exist |
+
+````
+
+---
+
+## 6. Install Dependencies
+
+The router tests use `supertest`. Install it:
+
+```bash
+npm install --save-dev supertest @types/supertest
+
 
 ## Contributing
 
@@ -58,3 +91,4 @@ Keep the build passing before merging.
 ## License
 
 MIT
+````
