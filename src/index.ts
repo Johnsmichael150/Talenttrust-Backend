@@ -2,11 +2,13 @@
  * TalentTrust API — entry point.
  *
  * Wires the Express application, initialises the SQLite persistence layer via
- * the database singleton, and mounts all route groups.
+ * the database singleton, mounts all route groups, and exposes an ops endpoint
+ * for the Stellar RPC circuit breaker.
  *
  * Environment variables:
- *   PORT    — HTTP port to bind (default: 3001)
- *   DB_PATH — Path to the SQLite file (default: talenttrust.db)
+ *   PORT             — HTTP port to bind (default: 3001)
+ *   DB_PATH          — Path to the SQLite file (default: talenttrust.db)
+ *   STELLAR_RPC_URL  — Stellar/Soroban RPC endpoint (default: soroban-testnet)
  */
 
 import express, { Request, Response, NextFunction } from "express";
@@ -14,6 +16,8 @@ import { getDb } from "./db/database";
 import { ContractRepository } from "./repositories/contractRepository";
 import { UserRepository } from "./repositories/userRepository";
 import type { ContractStatus } from "./db/types";
+import { stellarClient } from "./rpc/stellarClient";
+import { CircuitOpenError } from "./circuit-breaker";
 
 const app = express();
 const PORT = process.env["PORT"] ?? 3001;
@@ -29,6 +33,15 @@ const users = new UserRepository(db);
 
 app.get("/health", (_req: Request, res: Response) => {
   res.json({ status: "ok", service: "talenttrust-backend" });
+});
+
+/**
+ * GET /api/v1/circuit-breaker/status
+ * Returns live state and counters of the Stellar RPC circuit breaker.
+ * Use this for ops dashboards and health monitoring.
+ */
+app.get("/api/v1/circuit-breaker/status", (_req: Request, res: Response) => {
+  res.json({ circuitBreaker: stellarClient.getCircuitStats() });
 });
 
 // ── Contracts ────────────────────────────────────────────────────────────────
@@ -69,11 +82,9 @@ app.post("/api/v1/contracts", (req: Request, res: Response) => {
   };
 
   if (!title || !clientId || !freelancerId || amount === undefined) {
-    res
-      .status(400)
-      .json({
-        error: "title, clientId, freelancerId, and amount are required",
-      });
+    res.status(400).json({
+      error: "title, clientId, freelancerId, and amount are required",
+    });
     return;
   }
 
