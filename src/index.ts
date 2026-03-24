@@ -9,7 +9,7 @@ app.get('/health', (_req: Request, res: Response) => {
   res.json({ status: 'ok', service: 'talenttrust-backend' });
 });
 
-app.get('/api/v1/contracts', (_req: Request, res: Response) => {
+app.get('/api/v1/contracts',   (_req: Request, res: Response) => {
   res.json({ contracts: [] });
 });
 
