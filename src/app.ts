@@ -1,27 +1,47 @@
-import express, { Express, Request, Response } from 'express';
+/**
+ * @module app
+ * @description Express application factory.
+ *
+ * Separates app configuration from server bootstrap so the app can be
+ * imported in tests without binding to a port.
+ *
+ * @security
+ *  - express.json() body parser is scoped to this app instance only.
+ *  - All routes return JSON; no HTML rendering surface.
+ *  - Helmet-style headers should be added here when the dependency is
+ *    introduced (tracked in docs/backend/security.md).
+ */
 
- /**
-  * Core Express app for TalentTrust Backend.
-  * Mounts routes and middleware.
-  */
- export class TalentTrustApp {
-   private app: Express;
+import express, { Request, Response, NextFunction } from 'express';
+import { healthRouter } from './routes/health';
+import { contractsRouter } from './routes/contracts';
 
-   constructor() {
-     this.app = express();
-     this.app.use(express.json());
-     this.mountRoutes();
-   }
+/**
+ * Creates and configures the Express application.
+ *
+ * @returns Configured Express app instance (not yet listening).
+ */
+export function createApp(): express.Application {
+  const app = express();
 
-   private mountRoutes(): void {
-     // API routes
-     this.app.get('/api/v1/contracts', (_req: Request, res: Response) => {
-       res.json({ contracts: [] });
-     });
-   }
+  // ── Middleware ────────────────────────────────────────────────────────────
+  app.use(express.json());
 
-   getApp(): Express {
-     return this.app;
-   }
- }
+  // ── Routes ────────────────────────────────────────────────────────────────
+  app.use('/health', healthRouter);
+  app.use('/api/v1/contracts', contractsRouter);
 
+  // ── 404 handler ──────────────────────────────────────────────────────────
+  app.use((_req: Request, res: Response) => {
+    res.status(404).json({ error: 'Not Found' });
+  });
+
+  // ── Global error handler ─────────────────────────────────────────────────
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+    console.error(err.stack);
+    res.status(500).json({ error: 'Internal Server Error' });
+  });
+
+  return app;
+}
