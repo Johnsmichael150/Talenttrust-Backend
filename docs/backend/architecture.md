@@ -1,13 +1,37 @@
-# Backend Architecture Summary
+# Architecture — TalentTrust Backend
 
-The TalentTrust Backend is an Express.js Node.js application written in TypeScript, acting as the API gateway and metadata server for a decentralized freelancer escrow protocol. It follows a **Layered (N-Tier) MVC Pattern**.
+## Module Layout
 
-## Core Architecture Pattern
+```
+src/
+├── index.ts          # Entry point — binds HTTP server to PORT
+├── app.ts            # Express app factory (importable in tests)
+└── routes/
+    ├── health.ts     # GET /health
+    └── contracts.ts  # GET /api/v1/contracts
+```
 
-- **Presentation Layer (Controllers):** Handles HTTP requests, input validation, and HTTP responses.
-- **Business Logic Layer (Services/Modules):** Contains the core application logic, separating business rules from HTTP transport.
-- **Integration/Data Layer:** Manages interactions with external services (e.g., Stellar/Soroban via RPC) and databases.
-- **Middleware:** Cross-cutting concerns like authentication, error handling, and request logging.
+## Design Decisions
 
-## Application Entry Point
-- `src/index.ts` serves as the main entry point, bootstrapping the Express application, registering global middleware, and mounting route handlers.
+### App factory pattern
+`createApp()` in `app.ts` returns a configured Express instance without
+starting the server. This lets tests import the app without binding a port,
+keeping tests fast and side-effect-free.
+
+### Route modules
+Each route group lives in its own file under `src/routes/`. This makes it
+straightforward to add middleware, validation, or sub-routers per domain
+without touching unrelated code.
+
+## Planned Integrations
+
+- Stellar/Soroban SDK — on-chain contract interactions
+- Database layer — contract metadata persistence
+- Authentication middleware — JWT or Stellar keypair verification
+
+## Security Notes
+
+- All responses are JSON; no HTML rendering surface reduces XSS risk.
+- Error handler strips stack traces from responses (information disclosure prevention).
+- Dependency vulnerabilities are gated in CI via `npm audit --audit-level=high`.
+- Helmet headers should be added before the service handles production traffic.
