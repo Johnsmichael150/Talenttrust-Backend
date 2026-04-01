@@ -186,6 +186,15 @@ All configuration is managed through `src/config/` and validated at startup. Cop
 | `SOROBAN_RPC_URL` | `https://soroban-testnet.stellar.org` | Soroban JSON-RPC endpoint |
 | `SOROBAN_CONTRACT_ID` | *(empty)* | Deployed escrow contract ID |
 
+## API Endpoints
+
+- `GET /health` - Health check
+- `GET /api/v1/contracts` - Get contracts
+- `GET /api/v1/reputation/:id` - Get freelancer reputation profile
+- `PUT /api/v1/reputation/:id` - Update freelancer reputation profile
+
+See [docs/backend/reputation-api.md](docs/backend/reputation-api.md) for detailed Reputation API info.
+
 ## Contributing
 
 1. Fork the repo and create a branch: `git checkout -b feature/<ticket>-description`
